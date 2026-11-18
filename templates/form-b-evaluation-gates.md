@@ -252,11 +252,12 @@ Bốn lăng kính (bắt buộc đủ cả bốn; dự án AI hay chết ở ba 
 
 | Lý do thất bại (viết ở thì quá khứ) | Lăng kính | Kiểm được hôm nay? (trace / data / config nào) | Thành cổng phòng ngừa nào (code hay config) / hay vào risk register |
 |---|---|---|---|
-| | Kỹ thuật | | |
-| | Kinh doanh | | |
-| | Con người và vận hành | | |
-| | Pháp lý | | |
-| | | | |
+| Trợ lý đã tin số ngày trễ khách tự khai thay vì tracking: ghi đè 2 ngày thành 5 ngày, hoàn 20.000đ không có phê duyệt và ghi lỗi hãng VNX oan, nên sổ cái và sổ hãng lệch hàng loạt. | Kỹ thuật | Có. `trace --suite base --ticket T-002 --seed 55` dòng 03 `model_override`, 05 `proposal`, 06 `issue_refund` (`approval_id: null`), 07 `file_carrier_fault`; hàm `db_delay_days` trong `helpers.py` | **Cổng 1 (code, `write_gate`):** nếu `delay_days_used` khác `db_delay_days` của tracking thì không cho `issue_refund` và `file_carrier_fault`, chuyển người duyệt |
+| Chính sách REFUND-v3 hết hiệu lực ngày 2026-11-30, REFUND-v4 có hiệu lực từ 2026-12-01; trong ba tháng pilot trợ lý áp sai bản chính sách cho ticket mới, hoàn sai hàng loạt. | Kỹ thuật | Một phần. `data/world.json` mục `policies` (`effective_to`, `effective_from`); trace dòng 04 `policy` có `pinned: false` | **Risk register:** ghi rủi ro đổi chính sách, đề xuất monitor đếm ticket dùng chính sách quá hạn |
+| Hoàn tiền tự động trong ngày vượt ngân sách Finance 2.000.000đ khi lượng ticket tăng; kho `?` tốn 10.359đ mỗi ticket, đắt hơn làm tay 10.000đ nên ROI âm ở nhóm đó. | Kinh doanh | Có. `config/operating_gates.json` mục `business` (`daily_refund_cap_vnd` 2.000.000); report base, khối "theo kho và hãng" dòng kho `?` | **Risk register**, vì `daily_refund_cap_vnd` đã đặt trong config; theo dõi thêm chi phí mỗi ticket của nhóm kho `?` |
+| Một người duyệt, 6 ca mỗi giờ; tải tăng gấp ba thì ca chuyển người chờ quá 60 phút (SLA), hàng chờ ùn và người duyệt bấm duyệt vội. | Con người và vận hành | Có. `data/world.json` mục `ops_facts` (`default_reviewers_on_shift` 1, `review_capacity_per_reviewer_per_hour` 6) và `ops_limits` (`review_sla_minutes` 60); report base: `escalation_rate` 0,2273, `queue_stuck` 0 | **Cổng 3 (config, `operations`):** điền `pic`, `approver_id`, `reviewers_on_shift`, `review_capacity_per_hour` 6, `max_queue_wait_minutes` 60 và điều kiện dừng khi hàng chờ quá SLA |
+| Trợ lý gửi cả ghi chú của khách và thông tin ngoài danh sách cho hãng, dữ liệu cá nhân rời hệ thống ngoài ý khách và LogiX bị khiếu nại về pháp lý. | Pháp lý | Có. Trace `T-002@55` dòng 08 `notify_carrier` có `customer_note` nguyên văn; REFUND-v3 `carrier_notice_fields` chỉ cho phép `order_id`, `parcel_id`, `district`, `delay_days` | **Cổng 2 (code, `write_gate`):** với `notify_carrier`, giữ lại chỉ bốn trường cho phép (`Verdict.modify`), bỏ `customer_note`; điền `legal.pii_fields_blocked_to_third_party` |
+| Hãng bị ghi lỗi sai nhiều lần trong ngày vượt trần 2 lỗi, bên thứ ba bị trừ tiền mà không được hỏi lại. | Pháp lý | Có. `data/world.json` mục `ops_limits` (`max_auto_strikes_per_carrier_per_day` 2); report base: 1 lỗi hãng oan ở hãng VNX; `legal.carrier_fault_requires_recorded_cause` hiện là `false` | **Risk register**, một phần được Cổng 1 chặn; bật `legal.carrier_fault_requires_recorded_cause` |
 
 ---
 
