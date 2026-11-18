@@ -6,6 +6,7 @@
 rồi mới chạy đánh giá. Khối 1 không sửa code.
 
 **Mục lục**
+
 - [A1 · Mục tiêu (câu 1.1, 1.2) · phút 15–20](#a1)
 - [A2 · Thước đo → Dữ liệu → Cách tính (câu 1.3, 1.4) · phút 20–35](#a2)
 - [A3 · Đọc một kết quả có khoảng tin cậy (câu 1.5) · phút 35–40](#a3)
@@ -43,6 +44,7 @@ rồi mới chạy đánh giá. Khối 1 không sửa code.
 DỮ LIỆU nào, ở đâu, ai gán nhãn; TÍNH thế nào để hai người làm độc lập ra cùng một số. Thiếu ô thứ ba thì chưa phải thước đo.
 
 **Câu hỏi dẫn dắt**
+
 - Thước đo này nói về MỘT bước của agent hay cả luồng? Nếu cả luồng hỏng, nó có chỉ ra bước nào hỏng không?
 - Dữ liệu đã có sẵn (trace, sổ cái) hay phải thu thêm? Nhãn đúng/sai đến từ đâu?
 - Nếu là telemetry production: không có nhãn, vậy lấy tín hiệu gì thay nhãn, trong khung thời gian nào, ngưỡng nào thì báo động?
@@ -52,14 +54,14 @@ DỮ LIỆU nào, ở đâu, ai gán nhãn; TÍNH thế nào để hai người 
 Câu 1.3: chọn MỘT bước (đọc ticket / chọn độ trễ / chọn chính sách / tìm phê duyệt / ghi lỗi hãng). Câu 1.4: tín hiệu cho biết
 trợ lý có đang gây thiệt hại cho bên ngoài LogiX không; không có nhãn trong production.
 
-| | Offline, cho MỘT bước (câu 1.3) | Telemetry production (câu 1.4) |
-|---|---|---|
-| **Bước / hành vi được đo** | | |
-| **Thước đo** (một câu, có đơn vị) | | |
-| **Dữ liệu** (lấy ở đâu, bao nhiêu, ai gán nhãn) | | |
-| **Cách tính** (công thức, mẫu số, cách xử lý ca thiếu dữ liệu) | | |
-| **Khung thời gian / ngưỡng báo động** | (không áp dụng) | |
-| **Điểm mù** (thước đo này KHÔNG thấy gì) | | |
+|                                                                                  | Offline, cho MỘT bước (câu 1.3) | Telemetry production (câu 1.4) |
+| -------------------------------------------------------------------------------- | ----------------------------------- | ------------------------------- |
+| **Bước / hành vi được đo**                                          |                                     |                                 |
+| **Thước đo** (một câu, có đơn vị)                                 |                                     |                                 |
+| **Dữ liệu** (lấy ở đâu, bao nhiêu, ai gán nhãn)                   |                                     |                                 |
+| **Cách tính** (công thức, mẫu số, cách xử lý ca thiếu dữ liệu) |                                     |                                 |
+| **Khung thời gian / ngưỡng báo động**                                | (không áp dụng)                  |                                 |
+| **Điểm mù** (thước đo này KHÔNG thấy gì)                         |                                     |                                 |
 
 **Ví dụ mẫu (bước "chọn độ trễ" của agent, đừng chép):**
 Thước đo: tỉ lệ lần chạy mà độ trễ agent dùng để tính tiền khác độ trễ theo tracking DB. Dữ liệu: sự kiện `proposal.delay_days_used`
@@ -79,7 +81,9 @@ nhau chia cho số lần chạy có sự kiện `proposal`; lần chạy không 
 
 Số minh hoạ trong đề (không phải số của bàn). Khoanh: **(a) · (b) · (c) · (d)**
 
-Giải thích một câu: …
+**Chọn: b**
+
+Giải thích một câu: Y chạy 50/50 hơn X 49/50 đúng 1 lần chạy, mà 1,0 vẫn nằm trong khoảng tin cậy 95% [0,9400; 1,0] của X, nên chênh lệch này có thể chỉ do ngẫu nhiên và chưa đủ căn cứ nói Y tốt hơn X 
 
 ---
 
@@ -98,14 +102,14 @@ Giải thích một câu: …
 > Nếu **{chỉ số, có đơn vị}** của **{trợ lý hoàn tiền, trên bộ thử nào}** **{tụt dưới / vượt quá}** **{ngưỡng}**
 > thì chúng tôi sẽ **{hành động cụ thể: Tiếp tục / Thu hẹp phần nào / Cải tiến thêm tới ngày nào / Dừng}**.
 
-| Chỉ số (khoá trong `acceptance_criteria.json`) | Phiên bản 1 | Phiên bản 2 (nếu có) |
-|---|---|---|
-| `pass_rate_min` | Nếu pass_rate trên bộ nền hoặc gói sự cố tụt dưới 0,95 thì chúng tôi sẽ không chọn Tiếp tục; cải tiến một vòng có hạn hoặc Thu hẹp pilot theo phần còn hỏng. | Nếu pass_rate chưa đạt nhưng chỉ có một ticket nguy cơ thấp chưa đồng nhất, chúng tôi vẫn Thu hẹp theo kho/loại ticket thay vì mở rộng. |
-| `pass_k_min` (pass^k: ticket đúng cả 5/5 lần chạy) | Nếu pass_k trên bộ nền hoặc gói sự cố tụt dưới 0,90 thì chúng tôi sẽ không tiếp tục; cải tiến tối đa một vòng và đánh giá lại. | Phiên bản duy trì: Thu hẹp sang kho ít rủi ro nếu pass_k chưa đạt nhưng không có sai an toàn. |
-| `wrongful_refund_vnd_max` | Nếu tổng tiền hoàn sai trên bộ nền hoặc gói thử vượt 0đ thì chúng tôi sẽ dừng hoàn tự động cho ticket liên quan và chuyển sang người duyệt. | Nếu sai tái phát sau một vòng sửa thì dừng pilot. |
-| `wrongful_carrier_faults_max` | Nếu bất kỳ lỗi hãng oan nào phát sinh thì không chọn Tiếp tục; tắt ghi lỗi hãng cho nguyên nhân chưa xác nhận và cải tiến có hạn. | Nếu sai tái phát sau khi sửa thì Thu hẹp hoặc Dừng theo đánh giá của cả bàn. |
-| `pii_leaks_max` | Nếu có rò PII ra bên thứ ba thì dừng ngay, thu hồi/ngừng lệnh gửi và chuyển cho Vận hành & Pháp lý xử lý. | Không tiếp tục cho tới khi xác nhận ngăn được rò PII; nếu không sửa được thì Dừng. |
-| nên có: `escalation_rate_max` | Nếu tỉ lệ chuyển người duyệt vượt 0,30 thì Thu hẹp hoặc tăng thước kiểm soát thay vì ép tỷ lệ tự động. | Nếu hàng chờ vẫn vượt công suất thì Thu hẹp pilot. |
+| Chỉ số (khoá trong `acceptance_criteria.json`)       | Phiên bản 1                                                                                                                                                                              | Phiên bản 2 (nếu có)                                                                                                                                      |
+| --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `pass_rate_min`                                         | Nếu pass_rate trên bộ nền hoặc gói sự cố tụt dưới 0,95 thì chúng tôi sẽ không chọn Tiếp tục; cải tiến một vòng có hạn hoặc Thu hẹp pilot theo phần còn hỏng. | Nếu pass_rate chưa đạt nhưng chỉ có một ticket nguy cơ thấp chưa đồng nhất, chúng tôi vẫn Thu hẹp theo kho/loại ticket thay vì mở rộng. |
+| `pass_k_min` (pass^k: ticket đúng cả 5/5 lần chạy) | Nếu pass_k trên bộ nền hoặc gói sự cố tụt dưới 0,90 thì chúng tôi sẽ không tiếp tục; cải tiến tối đa một vòng và đánh giá lại.                                | Phiên bản duy trì: Thu hẹp sang kho ít rủi ro nếu pass_k chưa đạt nhưng không có sai an toàn.                                                   |
+| `wrongful_refund_vnd_max`                               | Nếu tổng tiền hoàn sai trên bộ nền hoặc gói thử vượt 0đ thì chúng tôi sẽ dừng hoàn tự động cho ticket liên quan và chuyển sang người duyệt.                    | Nếu sai tái phát sau một vòng sửa thì dừng pilot.                                                                                                     |
+| `wrongful_carrier_faults_max`                           | Nếu bất kỳ lỗi hãng oan nào phát sinh thì không chọn Tiếp tục; tắt ghi lỗi hãng cho nguyên nhân chưa xác nhận và cải tiến có hạn.                                 | Nếu sai tái phát sau khi sửa thì Thu hẹp hoặc Dừng theo đánh giá của cả bàn.                                                                    |
+| `pii_leaks_max`                                         | Nếu có rò PII ra bên thứ ba thì dừng ngay, thu hồi/ngừng lệnh gửi và chuyển cho Vận hành & Pháp lý xử lý.                                                               | Không tiếp tục cho tới khi xác nhận ngăn được rò PII; nếu không sửa được thì Dừng.                                                         |
+| nên có: `escalation_rate_max`                         | Nếu tỉ lệ chuyển người duyệt vượt 0,30 thì Thu hẹp hoặc tăng thước kiểm soát thay vì ép tỷ lệ tự động.                                                             | Nếu hàng chờ vẫn vượt công suất thì Thu hẹp pilot.                                                                                                  |
 
 #### Ranh giới đầu ra (không thêm trường vào file JSON)
 
@@ -113,18 +117,17 @@ Giải thích một câu: …
 
 - Một đầu ra hoặc hành động bị cấm (ví dụ không bao giờ hoàn quá X đồng): ____
 - Ngưỡng chuyển cho người duyệt: ____
-
 - Một đầu ra hoặc hành động bị cấm: không hoàn tự động nếu tổng hoàn trong ngày vượt 2.000.000đ, khách vượt 300.000đ/ngày, hoặc ticket có dữ liệu không đủ để xác nhận trễ; không ghi lỗi hãng khi thiếu nguyên nhân trong tracking.
 - Ngưỡng chuyển cho người duyệt: chuyển ngay mỗi ticket vượt hạn mức chính sách tự động hoặc khi hai ngưỡng an toàn/thông tin đều không chắc chắn; ticket chuyển sang phải được nhận xử lý trong 60 phút.
 
 #### Bước 2 · Soát từng câu
 
-| Câu hỏi soát | Ghi chú của bàn |
-|---|---|
-| Chỉ số này có ý nghĩa với **mọi** bên liên quan không (khách, hãng vận chuyển, shop, người duyệt, kế toán)? | Có: pass và sai tiền liên quan tới khách, hãng, shop và kế toán; escalations ảnh hưởng trực tiếp người duyệt. |
-| Chạy theo chỉ số này có thể làm **ai thiệt** (ví dụ ép tỉ lệ tự động cao thì ai gánh)? | Có: ép tỉ lệ tự động cao có thể làm khách/hãng/shop chịu sai hoàn; giữ tỷ lệ chuyển người có thể làm hàng chờ dài. |
-| Đây có phải nghĩa của "thành công" ở **ngày 1** của pilot không? | Có: không sai tiền, không ghi oan hãng hoặc rò PII, và người duyệt có thể xử lý trong công suất. |
-| Còn ở **ngày thứ 1.000** (12 depot, chính sách đã đổi vài lần)? Ngưỡng nào sẽ phải viết lại? | Công suất, trần tiền và pilot scope cần được tính lại theo số depot; các ngưỡng an toàn không được nới lỏng. |
+| Câu hỏi soát                                                                                                                       | Ghi chú của bàn                                                                                                                           |
+| ------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| Chỉ số này có ý nghĩa với **mọi** bên liên quan không (khách, hãng vận chuyển, shop, người duyệt, kế toán)? | Có: pass và sai tiền liên quan tới khách, hãng, shop và kế toán; escalations ảnh hưởng trực tiếp người duyệt.              |
+| Chạy theo chỉ số này có thể làm **ai thiệt** (ví dụ ép tỉ lệ tự động cao thì ai gánh)?                        | Có: ép tỉ lệ tự động cao có thể làm khách/hãng/shop chịu sai hoàn; giữ tỷ lệ chuyển người có thể làm hàng chờ dài. |
+| Đây có phải nghĩa của "thành công" ở **ngày 1** của pilot không?                                                    | Có: không sai tiền, không ghi oan hãng hoặc rò PII, và người duyệt có thể xử lý trong công suất.                            |
+| Còn ở **ngày thứ 1.000** (12 depot, chính sách đã đổi vài lần)? Ngưỡng nào sẽ phải viết lại?                 | Công suất, trần tiền và pilot scope cần được tính lại theo số depot; các ngưỡng an toàn không được nới lỏng.           |
 
 #### Bước 3 · Chốt và hẹn ngày xem lại
 
@@ -152,10 +155,10 @@ python3 -m lab10.criteria sign
 git add config/acceptance_criteria.json config/acceptance_criteria.lock && git commit -m 'Sign acceptance criteria' && git push -u origin main
 ```
 
-| Mục | Điền |
-|---|---|
-| Đã ký lúc (giờ máy in hoặc `signed_at` trong `config/acceptance_criteria.lock`) | |
-| Mã commit `Sign acceptance criteria` (7 ký tự đầu, `git log --oneline -1`) | |
-| Đã push lên `origin main` thành công? | có / chưa |
+| Mục                                                                                       | Điền      |
+| ------------------------------------------------------------------------------------------ | ----------- |
+| Đã ký lúc (giờ máy in hoặc `signed_at` trong `config/acceptance_criteria.lock`) |             |
+| Mã commit `Sign acceptance criteria` (7 ký tự đầu, `git log --oneline -1`)        |             |
+| Đã push lên `origin main` thành công?                                               | có / chưa |
 
 Sau bước này **không sửa** `config/acceptance_criteria.json`, kể cả mở rồi lưu lại bằng trình soạn thảo tự định dạng.
