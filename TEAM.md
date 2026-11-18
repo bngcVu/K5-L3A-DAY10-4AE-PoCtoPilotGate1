@@ -48,12 +48,14 @@ Mỗi thành viên tự viết một mục bên dưới (chép mẫu, đổi ti�
 - Quản lý repo, phân nhánh Git và đảm bảo pipeline hoạt động trơn tru.
 - Cài đặt và tinh chỉnh logic các hàm phòng vệ tại `lab10/guards.py` cho cả 2 vòng.
 - Thực thi các lệnh đo đạc, xuất báo cáo phục vụ các mốc quyết định Gate 1.
+- Khối 3 (thẻ S1): kéo thẻ về repo, chạy `grade --incident S1` lấy mốc prepared, trace `S1-01`, `S1-07`, `S1-20`, `S1-40`; tìm ra ba nguyên nhân (số ngày khách khai khác DB hai chiều, parcel DELIVERED thiếu `delivered_date`, lỗi hãng dồn dập vượt trần) và viết bốn cổng mới trong `lab10/guards.py` cùng hai chỉ số `model_override_rate`, `max_carrier_faults_per_day` trong `lab10/monitors.py`.
+- Chốt v2: chạy `check_submission --collect` và sửa các cảnh báo `[THIẾU]` cho tới khi in `ĐỦ THÀNH PHẦN`; gom Phiếu C, `submission.json`; chuẩn bị demo 3 cột (`base`, `prepared`, `after`). Việc trình bày demo sẽ ghi sau khi diễn ra.
 
 ### Bằng chứng
 
-- Mã commit: `0d135c4` và `9c80523` (ký tiêu chí), `64173df` (hai cổng `write_gate`), `58ced7d` (chốt cổng vòng 1)
-- Mã lần chạy (`runs/<mã>`): base `R-base-before-20261118-165931-c729df` · after `R-base-after-20261118-171808-3962f2` · prepared `R-base-prepared-20261118-173653-207099`
-- Dòng trong phiếu A/B/C: A3 (câu 1.5), B0 dòng 1–2, B1, B6, B7.1; đã dùng Claude Code hỗ trợ viết cổng, chạy lệnh và soạn phiếu
+- Mã commit: `0d135c4` và `9c80523` (ký tiêu chí), `64173df` (hai cổng `write_gate`), `58ced7d` (chốt cổng vòng 1), commit vòng 2 và gói nộp (chờ commit)
+- Mã lần chạy (`runs/<mã>`): base `R-base-before-20261118-165931-c729df` · after `R-base-after-20261118-171808-3962f2` · prepared `R-base-prepared-20261118-173653-207099`; thẻ S1: base `R-S1-before-20261118-230407-56e06d` · prepared `R-S1-prepared-20261118-230407-56e06d` · after `R-S1-after-20261118-230407-56e06d` (grade `R-S1-grade-20261118-230407-56e06d`); hồi quy bộ nền `R-base-after-20261118-230421-56e06d`
+- Dòng trong phiếu A/B/C: A3 (câu 1.5), B0 dòng 1–2, B1, B6, B7.1; Phiếu C: C0, C1, C2, C4–C9; đã dùng Claude Code hỗ trợ viết cổng, chạy lệnh và soạn phiếu
 
 ### Exit ticket
 
