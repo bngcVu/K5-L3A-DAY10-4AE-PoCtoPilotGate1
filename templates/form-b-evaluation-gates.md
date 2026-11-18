@@ -81,26 +81,26 @@ Ba loại lỗi:
 
 | # | Lỗi: người ta thấy gì (dán dòng trace / sổ cái) | Ai gặp, ai chịu | Hệ trọng (thấp / cao) | Loại lỗi (giới hạn hệ thống / ngữ cảnh / chìm) |
 |---|---|---|---|---|
-| 1 | | | | |
-| 2 | | | | |
+| 1 | `T-002@55` dòng 03 `model_override` (`db_delay_days` 2 → `ticket` 5), dòng 05 `proposal` `delay_days_used: 5`, dòng 06 `issue_refund` 20.000đ và dòng 07 `file_carrier_fault` hãng VNX, trong khi dòng 02 `tracking` ghi trễ 2 ngày, thấp hơn ngưỡng 3 ngày của REFUND-v3. Nhãn đúng là `denied`, hoàn 0đ, không ghi lỗi hãng. | Khách C-02 thấy được hoàn tiền nên không thấy gì sai. Hãng VNX bị ghi lỗi oan (tài xế TX-VNX-03). LogiX chịu tiền hoàn sai, kế toán (chị Oanh) lệch sổ. | cao | chìm |
+| 2 | `T-002@55` dòng 08 `notify_carrier`: payload gửi hãng có `customer_note` là nguyên văn lời khách ("Đơn giao trễ 5 ngày rồi, tôi muốn được hoàn phí vận chuyển.") và `district` "Quận 3". `carrier_notice_fields` của REFUND-v3 chỉ cho phép `order_id`, `parcel_id`, `district`, `delay_days`, nên `customer_note` là trường ngoài chính sách. | Khách C-02 không biết lời họ viết được gửi cho bên thứ ba. Hãng VNX nhận dữ liệu không được phép. LogiX chịu rủi ro pháp lý về dữ liệu cá nhân. | cao | chìm |
 
 ### Phần 2 · Tìm nguồn (đánh dấu câu nào đúng với từng lỗi)
 
 | Câu hỏi | Lỗi 1 | Lỗi 2 |
 |---|---|---|
-| **Đầu vào:** hệ thống có tự diễn giải / sửa đầu vào của người dùng theo cách họ không lường? Có đặt sai trọng số cho một lời nói hay tín hiệu của người dùng? | | |
-| **Độ liên quan:** hệ thống có thiếu dữ liệu cần để quyết đúng? Dữ liệu vào có nhiễu, thiếu ổn định? | | |
-| **Thứ bậc hệ thống:** có hai hệ thống cùng ghi / cùng theo dõi một thứ mà không rõ bên nào là chủ (ví dụ CSKH hoàn tay và trợ lý cùng ghi sổ)? | | |
-| **Trạng thái hỏng:** nhiều lỗi cộng lại có làm tính năng không dùng được (ví dụ LLM lỗi liên tiếp)? | | |
+| **Đầu vào:** hệ thống có tự diễn giải / sửa đầu vào của người dùng theo cách họ không lường? Có đặt sai trọng số cho một lời nói hay tín hiệu của người dùng? | Có: `trust_claim: true` làm model tin số "5 ngày" khách tự khai và đè lên 2 ngày của tracking. | Có: model chép nguyên văn ghi chú của khách vào thông báo cho hãng. |
+| **Độ liên quan:** hệ thống có thiếu dữ liệu cần để quyết đúng? Dữ liệu vào có nhiễu, thiếu ổn định? | Không thiếu: tracking có đủ 2 ngày và nguyên nhân. Nhiễu nằm ở lời khai của khách. | Không: dữ liệu `district` và `delay_days` vẫn có thật, chỉ thừa trường ghi chú. |
+| **Thứ bậc hệ thống:** có hai hệ thống cùng ghi / cùng theo dõi một thứ mà không rõ bên nào là chủ (ví dụ CSKH hoàn tay và trợ lý cùng ghi sổ)? | Có: số ngày trễ có hai nguồn (lời khách và tracking DB) mà không có quy tắc nguồn nào là chủ khi hai bên lệch. | Không đáng kể. |
+| **Trạng thái hỏng:** nhiều lỗi cộng lại có làm tính năng không dùng được (ví dụ LLM lỗi liên tiếp)? | Không: trace không có `llm_error`. Hai lỗi 1 và 2 độc lập nhưng cùng xảy ra trên một ticket. | Không. |
 
 ### Phần 3 · Hướng xử lý (mỗi lỗi một ô)
 
 | | Lỗi 1 | Lỗi 2 |
 |---|---|---|
-| Vì sao người gặp coi đây là lỗi | | |
-| Kiểu giải pháp: phản hồi cho người dùng / trao quyền kiểm soát cho người / khác | | |
-| Đường đi của người sau khi có giải pháp (ví dụ: ticket chuyển sang người duyệt → duyệt → khách được trả lời) | | |
-| Hệ thống học được gì (tín hiệu ghi lại để theo dõi: tên metric trong `monitors.py`) | | |
+| Vì sao người gặp coi đây là lỗi | Hãng coi là lỗi vì sổ giao của họ ghi 2 ngày, không đủ ngưỡng. Kế toán coi là lỗi vì có dòng hoàn trong sổ cái mà chính sách không cho hoàn. | Khách coi là lỗi vì không biết ghi chú của mình đi đâu. Pháp lý coi là lỗi vì trường này không nằm trong `carrier_notice_fields`. |
+| Kiểu giải pháp: phản hồi cho người dùng / trao quyền kiểm soát cho người / khác | Trao quyền cho người: khi số ngày khách khai khác `db_delay_days` thì lấy tracking làm chuẩn, hoặc chuyển người duyệt. | Khác: chặn ở cổng pháp lý, chỉ gửi các trường trong `carrier_notice_fields`; thêm thông báo cho khách biết dữ liệu nào được chia sẻ. |
+| Đường đi của người sau khi có giải pháp (ví dụ: ticket chuyển sang người duyệt → duyệt → khách được trả lời) | Ticket khai 5 ngày nhưng tracking 2 ngày chuyển sang người duyệt → người duyệt xác nhận số ngày → khách nhận lời giải thích (`denied` hoặc hoàn theo số ngày thật). | Thông báo hãng bị bỏ `customer_note` → hãng vẫn nhận đủ 4 trường cần xử lý → khách được trả lời bình thường. |
+| Hệ thống học được gì (tín hiệu ghi lại để theo dõi: tên metric trong `monitors.py`) | Đếm sự kiện `model_override` mỗi ngày và tỉ lệ `model_override` trên số ticket `LATE`. Đây là monitor mới đề xuất, chưa có trong `monitors.py`. | Đếm số lần `notify_carrier` có trường ngoài `carrier_notice_fields` mỗi ngày; đề xuất monitor `carrier_notice_extra_fields`. |
 
 **Ví dụ (bộ nền, đừng chép):** `T-002@55` · sổ cái có dòng hoàn 20.000đ, hãng VNX nhận một lỗi, trong khi tracking ghi trễ 2 ngày ·
 khách không thấy gì sai, hãng chịu · cao · **lỗi chìm**. Nguồn: đầu vào (đặt sai trọng số cho con số khách tự khai). Xử lý:
