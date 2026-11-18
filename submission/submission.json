@@ -6,12 +6,12 @@
     "NguyenThiDung-2A202603508",
     "NguyenHaiAnh-2A202603484"
   ],
-  "incident": "",
-  "decision_v1": "",
-  "decision_v2": "",
+  "incident": "S1",
+  "decision_v1": "Tiếp tục",
+  "decision_v2": "Tiếp tục",
   "three_lines": {
-    "environment_assumption": "",
-    "reduce_or_prevent": "",
-    "measure_in_pilot": ""
+    "environment_assumption": "tracking của hãng (đặc biệt hãng nhỏ như GHSH) luôn có `delivered_date`, `promised_date` và `delay_cause` đầy đủ và đúng; thực tế điểm phát quét sót hoặc nhập tay sai, và cổng của đội chỉ so với DB nên không bắt được ngày nhập sai.",
+    "reduce_or_prevent": "NGĂN đối với hai lỗi đã định nghĩa rõ (số ngày khách khai khác DB và parcel DELIVERED thiếu `delivered_date`) vì lệnh ghi bị chặn trước khi xảy ra ở `write_gate`, nhưng chỉ GIẢM với lỗi dồn dập (không tính cửa sổ 7 ngày) và với số ngày khách khai viết bằng chữ.",
+    "measure_in_pilot": "tỉ lệ parcel thiếu hoặc sai `delivered_date` theo từng hãng, tỉ lệ ticket chuyển người và thời gian chờ thật của người duyệt, số lỗi hãng thật trong cửa sổ 7 ngày, và chi phí mỗi ticket thật so với làm tay."
   }
 }

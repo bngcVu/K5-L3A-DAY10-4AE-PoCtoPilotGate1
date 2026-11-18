@@ -29,20 +29,60 @@ lab10.helpers: db_delay_days, ticket_parcel, effective_policy, entitlement_vnd, 
 
 Mặc định dưới đây cho qua tất cả (= mốc base).
 """
+import re
+
 from . import helpers as H  # noqa: F401
 from .tools import Verdict
 
+_CLAIM_DAYS = re.compile(r"\d+\s*ngày", re.IGNORECASE)
+
 
 def pre_guard(ctx):
+    # Cổng 6 (VÒNG 2, nhánh WRONG): khách khai số ngày trễ KHÁC tracking DB (nhiều hơn hoặc ít hơn) thì trợ lý
+    # không được đọc con số đó. Thay bằng "mấy ngày" để trợ lý quyết theo tracking DB, khỏi phải chuyển người
+    # (giữ ROI) mà hãng cũng không bị ghi lỗi oan, khách không bị từ chối oan. Parcel thiếu ngày giao thì để cổng 3 xử lý.
+    t = ctx.ticket
+    order = ctx.tools.lookup_order(t.get("order_id")) if t.get("order_id") else None
+    text = t.get("text") or ""
+    claims = [int(c.split()[0].rstrip("ngàyNGÀY ")) for c in _CLAIM_DAYS.findall(text)] if order else []
+    if claims and order.get("parcels") and not _delivered_without_date(order):
+        db_days = H.db_delay_days(H.ticket_parcel(order, t, ctx.as_of), ctx.as_of)
+        if any(c != db_days for c in claims):
+            ctx.log("claim_days_removed", claimed=claims, db_delay_days=db_days)
+            return Verdict.rewrite("bỏ số ngày trễ khách tự khai (khác tracking DB)", _CLAIM_DAYS.sub("mấy ngày", text))
     return Verdict.allow()
+
+
+def _order_of(ctx, action):
+    """Đơn của lệnh ghi: lấy theo action; send_reply không có order_id nên lấy theo ticket gốc."""
+    order_id = action.get("order_id") or ctx.ticket.get("order_id")
+    return ctx.tools.lookup_order(order_id) if order_id else None
+
+
+def _delivered_without_date(order):
+    """Parcel đã DELIVERED nhưng thiếu delivered_date: helpers.db_delay_days lấy "hôm nay" làm ngày giao,
+    nên độ trễ bị thổi phồng (đơn trễ 2 ngày thành 6 ngày) mà không ai thấy."""
+    return [p["parcel_id"] for p in (order or {}).get("parcels", [])
+            if str(p.get("status", "")).upper() == "DELIVERED" and not p.get("delivered_date")]
+
+
+def _strike_cap_hit(ctx, order):
+    """Hãng nào của đơn đã đủ số lỗi tự động trong ngày (ops_limits.max_auto_strikes_per_carrier_per_day)?"""
+    cap = ctx.tools.ops_limits().get("max_auto_strikes_per_carrier_per_day")
+    if not cap or not order:
+        return []
+    hit = []
+    for cid in sorted({p["carrier_id"] for p in order.get("parcels", [])}):
+        if len(ctx.tools.fault_rows(carrier_id=cid)) >= cap:
+            hit.append(cid)
+    return hit
 
 
 def _delay_used_vs_db(ctx, action):
     """(số ngày trợ lý đang dùng để quyết, số ngày trễ theo tracking DB). None nếu không xác định được.
 
     Nguồn sự thật là tracking DB (đơn hàng trong world), không phải chữ khách viết trong ticket."""
-    order_id = action.get("order_id")
-    order = ctx.tools.lookup_order(order_id) if order_id else None
+    order = _order_of(ctx, action)
     if not order or not order.get("parcels"):
         return None
     db_days = max(H.db_delay_days(p, ctx.as_of) for p in order["parcels"])
@@ -58,7 +98,7 @@ def write_gate(ctx, action):
     # action = {"tool": "issue_refund", "ticket_id":..., "order_id":..., "amount_vnd":..., "payer":..., ...}
     tool = action.get("tool")
 
-    # Cổng 1 (B6 dòng 1): không hoàn tiền / không ghi lỗi hãng dựa trên số ngày trễ lớn hơn tracking DB.
+    # Cổng 1 (B6 dòng 1, vòng 1): không hoàn tiền / không ghi lỗi hãng dựa trên số ngày trễ lớn hơn tracking DB.
     # Số ngày khách tự khai chỉ là dữ liệu; khi nó đè lên tracking thì chuyển người duyệt.
     if tool in ("issue_refund", "file_carrier_fault"):
         pair = _delay_used_vs_db(ctx, action)
@@ -66,6 +106,36 @@ def write_gate(ctx, action):
             ctx.log("delay_mismatch", tool=tool, delay_used=pair[0], db_delay_days=pair[1])
             return Verdict.escalate(
                 f"số ngày trễ đang dùng ({pair[0]}) lớn hơn tracking DB ({pair[1]}): chuyển người duyệt")
+
+    # ---- VÒNG 2 (thẻ S1: hãng bị ghi lỗi oan) ----
+    if tool in ("issue_refund", "file_carrier_fault", "send_reply"):
+        order = _order_of(ctx, action)
+
+        # Cổng 3 (INCOMPLETE): parcel đã giao mà thiếu delivered_date thì độ trễ trong DB không đáng tin
+        # (helpers.db_delay_days lấy ngày hôm nay làm ngày giao). Không ghi tiền, không ghi lỗi hãng: người duyệt đối chiếu sổ giao.
+        missing = _delivered_without_date(order)
+        if missing:
+            ctx.log("delivered_without_date", tool=tool, parcels=missing)
+            return Verdict.escalate(
+                f"parcel {', '.join(missing)} đã DELIVERED nhưng thiếu delivered_date: độ trễ không đáng tin, chuyển người duyệt")
+
+        # Cổng 4 (WRONG, chiều ngược): số ngày trợ lý dùng KHÁC tracking DB, kể cả khi nhỏ hơn.
+        # Khách khai ít hơn thực tế thì trợ lý từ chối oan một khoản hoàn hợp lệ, và hãng không bị ghi lỗi đáng ra phải ghi.
+        pair = _delay_used_vs_db(ctx, action)
+        if pair is not None and pair[0] != pair[1]:
+            ctx.log("delay_mismatch", tool=tool, delay_used=pair[0], db_delay_days=pair[1])
+            return Verdict.escalate(
+                f"số ngày trễ đang dùng ({pair[0]}) khác tracking DB ({pair[1]}): chuyển người duyệt")
+
+    # Cổng 5 (trần kinh doanh/vận hành): từ lỗi thứ 3 của cùng một hãng trong ngày phải có người duyệt
+    # (ops_limits.max_auto_strikes_per_carrier_per_day). Kiểm trước lệnh hoàn tiền để chưa ghi gì khi chuyển người.
+    if tool in ("issue_refund", "file_carrier_fault"):
+        will_fault = tool == "file_carrier_fault" or any(
+            e.get("type") == "proposal" and e.get("do_fault") for e in ctx.events)
+        hit = _strike_cap_hit(ctx, _order_of(ctx, action)) if will_fault else []
+        if hit:
+            ctx.log("carrier_strike_cap", tool=tool, carriers=hit)
+            return Verdict.escalate(f"hãng {', '.join(hit)} đã đủ lỗi tự động trong ngày: chuyển người duyệt")
 
     # Cổng 2 (B6 dòng 5): thông báo cho hãng chỉ gửi các trường chính sách cho phép (carrier_notice_fields).
     # Mọi trường khác (ghi chú của khách, liên hệ người nhận...) bị bỏ trước khi rời hệ thống.

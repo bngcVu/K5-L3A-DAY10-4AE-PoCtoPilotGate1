@@ -5,7 +5,7 @@
 - Tên nhóm (`TenNhom`, không dấu, không khoảng trắng): K5-L3A-DAY10-4AE-PoCtoPilotGate1
 - Lớp: `L3A`
 - Repo của bàn: `K5-L3A-DAY10-4AE-PoCtoPilotGate1`
-- Thẻ sự cố đã bốc (S1–S8): (Điền mã thẻ nhận ở phút 125, ví dụ S1)
+- Thẻ sự cố đã bốc (S1–S8): S1
 
 ## Thành viên
 
@@ -51,14 +51,14 @@ Mỗi thành viên tự viết một mục bên dưới (chép mẫu, đổi ti�
 
 ### Bằng chứng
 
-- Mã commit: ...
-- Mã lần chạy (`runs/<mã>`): ...
-- Dòng trong phiếu A/B/C: ...
+- Mã commit: `0d135c4` và `9c80523` (ký tiêu chí), `64173df` (hai cổng `write_gate`), `58ced7d` (chốt cổng vòng 1)
+- Mã lần chạy (`runs/<mã>`): base `R-base-before-20261118-165931-c729df` · after `R-base-after-20261118-171808-3962f2` · prepared `R-base-prepared-20261118-173653-207099`
+- Dòng trong phiếu A/B/C: A3 (câu 1.5), B0 dòng 1–2, B1, B6, B7.1; đã dùng Claude Code hỗ trợ viết cổng, chạy lệnh và soạn phiếu
 
 ### Exit ticket
 
-- Một điều học được: ...
-- Một điều còn chưa chắc: ...
+- Một điều học được: hash khoá tiêu chí tính cả dấu xuống dòng, nên file ký trên Windows (CRLF) lệch với máy khác (LF); phải kiểm `git ls-files --eol` trước khi ký.
+- Một điều còn chưa chắc: hai cổng so số ngày với tracking DB và lọc trường gửi hãng có bao phủ được các biến thể trong thẻ sự cố và bộ test ẩn hay không.
 
 ---
 
@@ -87,14 +87,14 @@ Mỗi thành viên tự viết một mục bên dưới (chép mẫu, đổi ti�
 
 ### Bằng chứng
 
-- Mã commit: ...
-- Mã lần chạy (`runs/<mã>`): ...
-- Dòng trong phiếu A/B/C: ...
+- Mã commit: `26c1241` (câu 1.3–1.4), `97e85e2` (câu 2.7–2.8), `121de16` (kiểm chéo mốc 105–115) (Vũ điền thay, Lab Coach đã cho phép)
+- Mã lần chạy (`runs/<mã>`): dùng các mã ở B0 (không có lần chạy riêng ghi trong phiếu)
+- Dòng trong phiếu A/B/C: A2 (câu 1.3–1.4), B2, B7.2, B7.3
 
 ### Exit ticket
 
-- Một điều học được: ...
-- Một điều còn chưa chắc: ...
+- Một điều học được: kiểm chéo trên máy khác bắt được lỗi mà người làm không thấy (hash tiêu chí lệch do CRLF/LF; `runs/` không nằm trong git nên không thấy báo cáo của người khác). (Vũ điền thay, Lab Coach đã cho phép)
+- Một điều còn chưa chắc: hai ticket hiểm `--adhoc` ngoài bộ nền có đủ đại diện cho bộ test ẩn hay không. (Vũ điền thay, Lab Coach đã cho phép)
 
 ---
 
@@ -160,11 +160,11 @@ Mỗi thành viên tự viết một mục bên dưới (chép mẫu, đổi ti�
 
 ### Bằng chứng
 
-- Mã commit: ...
-- Mã lần chạy (`runs/<mã>`): ...
-- Dòng trong phiếu A/B/C: ...
+- Mã commit: `ddac025` (soát câu tiêu chí), `b34aa9c` (A5), `f4a59c8` (câu 2.4: HAZOP và checklist), `bcb804c` (câu 2.10: `operations`, `legal`, runbook 1–3) (Vũ điền thay, Lab Coach đã cho phép)
+- Mã lần chạy (`runs/<mã>`): dùng các mã ở B0 (không có lần chạy riêng ghi trong phiếu)
+- Dòng trong phiếu A/B/C: A4–A5, B4, B5, B7.5–B7.6
 
 ### Exit ticket
 
-- Một điều học được: ...
-- Một điều còn chưa chắc: ...
+- Một điều học được: runbook và config phải khớp từng con số (1 người trực, 6 ca/giờ, hạn 60 phút), vì người chấm đối chiếu hai bên. (Vũ điền thay, Lab Coach đã cho phép)
+- Một điều còn chưa chắc: một người trực có đủ khi tải tăng gấp ba hay không, và điều kiện dừng "hơn 8 ca ùn" đã hợp lý chưa. (Vũ điền thay, Lab Coach đã cho phép)

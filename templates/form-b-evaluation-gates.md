@@ -406,22 +406,22 @@ bao nhiêu thời gian? (3) Có phần nào của dự án không nên làm ti�
 
 | | **v1** (phút 105–115, TRƯỚC khi nhận thẻ sự cố) |
 |---|---|
-| Commit ký tiêu chí (message `Sign acceptance criteria`; hash commit, tuỳ chọn) | |
-| Hash chốt cổng vòng 1 (8 ký tự lệnh `lab10.checkpoint` in ra, tuỳ chọn) | |
-| Mã lần chạy dùng làm bằng chứng | bộ nền, mốc base: ________ · bộ nền với cổng vòng 1 (prepared): ________ |
-| Còn dòng "vượt trần" nào trong report? (hàng chờ, chi phí, ROI, trần tiền, pháp lý) | |
-| Kho hoặc hãng có số xấu nhất: ____. Nếu chỉ nhìn phân khúc này, quyết định có đổi không? *(Đọc khối "theo kho và hãng" ở cuối output `lab10.eval` / `lab10.grade`, hoặc mục `by_segment` trong `report.json`.)* | |
-| Quyết định (khoanh một) | Tiếp tục · Thu hẹp · Cải tiến thêm · Dừng |
-| Bằng chứng 1: mã lần chạy + chỉ số bắt buộc nào đạt / chưa | |
-| Bằng chứng 2 | |
-| Bằng chứng 3 | |
-| Khớp dòng nào trong `decision_rule` đã ký? | |
-| Nếu Thu hẹp: cắt phần nào, vì sao | |
-| Nếu Cải tiến thêm: giả thuyết cụ thể + hạn | |
-| Nếu Dừng: bài học ghi lại | |
-| Một bằng chứng còn thiếu (thứ bộ nền chưa đo được) | |
-| Ngày quyết định lại (trừ khi Dừng) | |
-| PIC ký | |
+| Commit ký tiêu chí (message `Sign acceptance criteria`; hash commit, tuỳ chọn) | `0d135c4` (ký lần đầu); `9c80523` (ký lại, sửa lệch CRLF/LF, nội dung JSON không đổi, trước lần `eval` đầu tiên) |
+| Hash chốt cổng vòng 1 (8 ký tự lệnh `lab10.checkpoint` in ra, tuỳ chọn) | `399041eb` |
+| Mã lần chạy dùng làm bằng chứng | bộ nền, mốc base: `R-base-before-20261118-165931-c729df` · bộ nền với cổng vòng 1 (prepared): `R-base-prepared-20261118-173653-207099` |
+| Còn dòng "vượt trần" nào trong report? (hàng chờ, chi phí, ROI, trần tiền, pháp lý) | Không. Hàng chờ 0 ca ùn (hạn 60 phút), chi phí 5.641đ ≤ 10.000đ, ROI 0,77 ≥ 0,15, hoàn tự động 155.000đ ≤ 2.000.000đ, hoàn sai ngày tệ nhất 0đ. Lưu ý: tỉ lệ chuyển người duyệt hiển thị 0,3077 gồm cả 10% ca kiểm lại (`review_sampling_pct`); chỉ số đã ký `escalation_rate` là 0,2462 ≤ 0,3. |
+| Kho hoặc hãng có số xấu nhất: Kho `?` (chi phí 10.359đ mỗi ticket, đắt hơn làm tay, chỉ 5 lần chạy); kho có đơn thật xấu nhất là HCM (chi phí 3.683đ). Hãng: không hãng nào hoàn sai hay lỗi oan (GHSH, LGX, VNX đều 1,0). Nếu chỉ nhìn phân khúc này, quyết định có đổi không? *(Đọc khối "theo kho và hãng" ở cuối output `lab10.eval` / `lab10.grade`, hoặc mục `by_segment` trong `report.json`.)* | Không đổi: kho `?` chỉ có 5 lần chạy và nằm ngoài phạm vi pilot HN, HCM; trong phạm vi, mọi kho đều đạt cả 5 chỉ số bắt buộc. |
+| Quyết định (khoanh một) | **Tiếp tục** (trong phạm vi pilot kho HN và HCM đã đặt ở `business.pilot_scope`) |
+| Bằng chứng 1: mã lần chạy + chỉ số bắt buộc nào đạt / chưa | `R-base-prepared-20261118-173653-207099`: cả 5 chỉ số bắt buộc đạt (`pass_rate` 1,0; `pass_k` 1,0; hoàn sai 0đ; lỗi hãng oan 0; lộ PII 0); `gate` báo "Chỉ số bắt buộc: đều đạt". |
+| Bằng chứng 2 | Các ngưỡng kinh doanh/vận hành đã ký đều đạt: chi phí 5.641đ ≤ 10.000đ, ROI 0,77 ≥ 0,15, `queue_stuck` 0; `escalation_rate` 0,2462 ≤ 0,3; không có dòng vượt trần. |
+| Bằng chứng 3 | So với base `R-base-before-20261118-165931-c729df` (hoàn sai 20.000đ, 1 lỗi hãng oan, đều do `T-002@55`), cổng vòng 1 đưa cả hai về 0; `legit_pass` 65/65, không ca đang đúng nào bị hỏng. |
+| Khớp dòng nào trong `decision_rule` đã ký? | Dòng **Tiếp tục**: tất cả 5 chỉ số bắt buộc, `pass_k` và các ngưỡng kinh doanh/vận hành đều đạt; không vượt trần, hoàn sai, lỗi hãng oan hay rò PII. |
+| Nếu Thu hẹp: cắt phần nào, vì sao | Không áp dụng. Phạm vi HN và HCM là phạm vi pilot đã đặt từ đầu (độ phủ 0,5909), không phải phần cắt thêm để đạt ngưỡng. |
+| Nếu Cải tiến thêm: giả thuyết cụ thể + hạn | Không áp dụng. |
+| Nếu Dừng: bài học ghi lại | Không áp dụng. |
+| Một bằng chứng còn thiếu (thứ bộ nền chưa đo được) | Bộ nền chỉ có 22 ticket và chưa có sự cố thật: chưa đo hành vi khi đổi chính sách REFUND-v3 → REFUND-v4 (hiệu lực 2026-12-01) và khi tải tăng gấp ba trên một người duyệt. |
+| Ngày quyết định lại (trừ khi Dừng) | 2026-11-27, trước ngày REFUND-v4 có hiệu lực (2026-12-01). |
+| PIC ký | Nguyễn Thị Dung |
 
 Xong v1 thì lưu và đẩy một bản (sau mốc này không sửa cột v1):
 
