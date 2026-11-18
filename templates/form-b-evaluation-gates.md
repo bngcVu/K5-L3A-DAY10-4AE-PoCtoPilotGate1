@@ -120,24 +120,24 @@ Gợi ý: mở `data/world.json` phần `policies`, `orders[].parcels`, `ops_lim
 
 | Mục | Điền cho trợ lý hoàn tiền |
 |---|---|
-| Người dùng | |
-| Việc người dùng cần làm xong | |
-| Đầu ra của hệ thống (kể cả các lệnh ghi) | |
-| Dữ liệu trợ lý đọc lúc chạy (bảng nào trong `data/world.json`) | |
-| Trường then chốt quyết định tiền và lỗi hãng | |
-| Với mỗi trường then chốt: **nguồn sự thật** hay **bản sao** (ai cập nhật, khi nào)? | |
-| Định dạng cần để ý (ngày, trường được phép trống, đơn nhiều kiện) | |
-| Thế giới thật làm dữ liệu lệch ở đâu (theo mùa, đổi chính sách, giờ cao điểm, người nhập tay)? | |
-| Câu người ngoài sẽ hỏi về nguồn dữ liệu ("sao hệ thống biết đơn trễ mấy ngày?") | |
+| Người dùng | Khách mua hàng, CSKH, trưởng ca duyệt, kế toán đối soát, hãng vận chuyển và shop. |
+| Việc người dùng cần làm xong | Xác nhận giao trễ; tính quyền hoàn; ghi sổ; gửi thông báo cho hãng và trả lời khách bằng dữ liệu truy vết được. |
+| Đầu ra của hệ thống (kể cả các lệnh ghi) | `issue_refund`, `file_carrier_fault`, `notify_carrier`, `send_reply`, kèm số tiền, policy_id, parcel_id và lý do. |
+| Dữ liệu trợ lý đọc lúc chạy (bảng nào trong `data/world.json`) | `orders[].parcels`, `policies`, `ops_limits`, `ops_facts`, `staff`, `carriers`, `customers`, `merchants`. |
+| Trường then chốt quyết định tiền và lỗi hãng | `warehouse_id`, `promised_date`, `delivered_date`, `delay_cause`, `carrier_id`, `goods_value_vnd`, `shipping_fee_vnd`, `effective_from/to`, `auto_limit_vnd`. |
+| Với mỗi trường then chốt: **nguồn sự thật** hay **bản sao** (ai cập nhật, khi nào)? | Tracking tạo `promised_date/delivered_date/status/delay_cause`; chính sách do LogiX quản trị theo effective_from/to; ops_limits do Finance/Ops thống nhất. |
+| Định dạng cần để ý (ngày, trường được phép trống, đơn nhiều kiện) | Ngày ISO, kiện có thể nhiều; thiếu hoặc trống trường tracking không được mặc định thành trạng thái giao trễ. |
+| Thế giới thật làm dữ liệu lệch ở đâu (theo mùa, đổi chính sách, giờ cao điểm, người nhập tay)? | Quét điểm phát trễ, nhập ngày tay, đổi chính sách vào ngày hiệu lực và cao điểm làm hàng chờ/người nhập sai. |
+| Câu người ngoài sẽ hỏi về nguồn dữ liệu ("sao hệ thống biết đơn trễ mấy ngày?") | Hỏi mã kiện, trường tracking nguồn nào, và phiên bản chính sách hiệu lực tại ngày xử lý là gì. |
 
 **Tóm lại (điền vào chỗ trống):**
-Trợ lý dùng `__________`, `__________`, `__________` để giúp `__________` làm được `__________`.
-Trường mà nếu sai thì tiền hoặc lỗi hãng sai theo: `__________`, `__________`.
-Chúng tôi biết thế giới thật sẽ làm dữ liệu lệch ở: `__________`. Dấu hiệu nhìn thấy sớm nhất: `__________`.
+Trợ lý dùng `orders[].parcels`, `policies`, `ops_limits` để giúp khách và CSKH xử lý yêu cầu hoàn tiền chậm giao.
+Trường mà nếu sai thì tiền hoặc lỗi hãng sai theo: `promised_date/delivered_date/delay_cause` và chính sách hiệu lực.
+Chúng tôi biết thế giới thật sẽ làm dữ liệu lệch ở: quét tracking thiếu, nhập tay và đổi chính sách. Dấu hiệu nhìn thấy sớm nhất: tracking không khớp ticket hoặc trace không ghi policy_id đang hiệu lực.
 
-**Ví dụ drift trong 3 tháng tới** (lấy từ dòng "thế giới thật làm dữ liệu lệch"): cái gì đổi `____` · đổi ngày nào `____` ·
-trường nào cho thấy `____` · con số nào của Bản tiêu chí bị ảnh hưởng `____`.
-Đây là đầu vào đổi hay quan hệ vào–ra đổi? Chỉ số nào sẽ phát hiện? `__________`
+**Ví dụ drift trong 3 tháng tới** (lấy từ dòng "thế giới thật làm dữ liệu lệch"): cái gì đổi `chính sách REFUND-v4 bắt đầu hiệu lực` · đổi ngày nào `2026-12-01` ·
+trường nào cho thấy `effective_from`, `min_days_fee`, `min_days_bonus`, `auto_limit_vnd`, `fault_causes` · con số nào của Bản tiêu chí bị ảnh hưởng `pass_rate`, `pass_k`, `wrongful_refund_vnd_max`, `wrongful_carrier_faults_max`.
+Đây là đầu vào đổi hay quan hệ vào–ra đổi? Đây là đầu vào chính sách đổi; chỉ số phát hiện là tỉ lệ ticket dùng sai phiên bản chính sách hoặc trace policy_id không khớp ngày chạy.
 
 **Ví dụ một dòng (đừng chép):** trường then chốt `parcels[].delivered_date` · bản ghi do máy quét ở điểm phát tạo ra, là nguồn
 sự thật về ngày giao · lệch khi điểm phát quét sót hoặc nhập bù bằng tay.
@@ -308,10 +308,10 @@ Mỗi con số kèm một câu lý do, lấy từ `data/world.json` → `ops_lim
 
 | Khoá | Giá trị bàn đặt | Lý do (một câu, có số) |
 |---|---|---|
-| `business.daily_refund_cap_vnd` | | |
-| `business.cost_budget_per_ticket_vnd` | | |
-| `business.pilot_scope` (all / warehouse / percent) | | |
-| `business.roi_min` | | |
+| `business.daily_refund_cap_vnd` | 2.000.000đ/ngày | Theo `ops_limits.daily_auto_refund_budget_vnd = 2.000.000đ`, ngăn tổng hoàn tự động vượt ngân sách Finance trong ngày. |
+| `business.cost_budget_per_ticket_vnd` | 1.500đ/ticket | Theo `ops_limits.max_llm_cost_per_ticket_vnd = 1.500đ`, giới hạn chi phí LLM và nền tảng cho một ticket. |
+| `business.pilot_scope` (all / warehouse / percent) | Kho HN và HCM, 100% trong hai kho | Pilot bắt đầu ở hai depot nhưng dữ liệu mock có sẵn HN/HCM; thu hẹp theo kho giúp đối chiếu vùng Bắc/Nam mà không mở sang DN/CT/HCM-B2B trong vòng đầu. |
+| `business.roi_min` | 0.15 | Dựa trên chi phí làm tay 10.000đ/ticket và chi phí chuyển duyệt 10.000đ/ticket; cần ROI tối thiểu 15% để hỗ trợ pilot thay vì chỉ chuyển chi phí sang người duyệt. |
 
 ### B7.5 · Câu 2.10 · Cổng con người, vận hành, pháp lý + Runbook phần 1–3
 

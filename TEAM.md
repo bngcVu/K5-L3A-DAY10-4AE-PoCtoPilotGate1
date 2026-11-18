@@ -117,20 +117,21 @@ Mỗi thành viên tự viết một mục bên dưới (chép mẫu, đổi ti�
 
 ### Đóng góp cụ thể
 
-- Định lượng hóa các tiêu chí thành công tài chính: trần hoàn sai, chi phí mỗi ticket, ROI tối thiểu.
-- Cấu hình và bảo vệ các tham số kinh doanh trong `config/operating_gates.json`.
-- Lập luận và bảo vệ quyết định Gate 1 (Tiếp tục / Thu hẹp / Cải tiến / Dừng) dựa trên bằng chứng dữ liệu.
+- Định lượng tiêu chí thành công tài chính: trần hoàn sai bằng 0đ, chi phí mỗi ticket tối đa 10.000đ, ROI tối thiểu 15%.
+- Cấu hình các tham số kinh doanh trong `config/operating_gates.json`: trần hoàn tự động 2.000.000đ/ngày, ngân sách LLM 1.500đ/ticket, pilot HN/HCM 100%.
+- Điền mục tiêu, bản đồ dữ liệu và drift chính sách trong Phiếu A/B; chuẩn bị khung HAZOP tác động tài chính/ROI cho vòng sự cố.
+- Chưa ghi quyết định v1/v2 vì cần report base/prepared/after và thẻ sự cố đã bốc.
 
 ### Bằng chứng
 
-- Mã commit: ...
-- Mã lần chạy (`runs/<mã>`): ...
-- Dòng trong phiếu A/B/C: ...
+- Mã commit: chờ commit riêng phần thay đổi của Dung.
+- Mã lần chạy (`runs/<mã>`): chờ Vũ chạy base/prepared và lệnh grade incident.
+- Dòng trong phiếu A/B/C: A1, A4, B3, B7.4; B8/C12 chờ bằng chứng báo cáo.
 
 ### Exit ticket
 
-- Một điều học được: ...
-- Một điều còn chưa chắc: ...
+- Một điều học được: tiêu chí phải có ngưỡng, hành động dừng/thu hẹp và nguồn dữ liệu trước khi xem kết quả.
+- Một điều còn chưa chắc: mức ROI 15% cần đối chiếu report thực tế về chi phí LLM và giá trị ticket sau khi pilot.
 
 ---
 
