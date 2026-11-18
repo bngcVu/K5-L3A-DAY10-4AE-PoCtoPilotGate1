@@ -13,7 +13,7 @@ Họ tên đầy đủ và MSSV của **mọi** thành viên; thêm dòng nếu 
 
 | STT | Họ và tên | MSSV | Vai | Trưởng nhóm |
 | --: | --------- | ---- | --- | :---------: |
-|   1 |           |      |     |             |
+|   1 | Bùi Ngọc Vũ          |  2A202603463    |     |             |
 |   2 |           |      |     |             |
 |   3 |           |      |     |             |
 |   4 |           |      |     |             |
