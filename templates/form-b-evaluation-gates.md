@@ -30,7 +30,7 @@ Mọi con số trong quyết định Gate 1 phải trỏ về một dòng ở đ
 | # | Mã lần chạy | Bộ ticket · mốc | Đổi MỘT thứ gì so với lần trước | pass_rate (khoảng tin cậy 95%) | pass_k | Hoàn sai (đ) · lỗi hãng oan · lộ dữ liệu | Tỉ lệ chuyển người | Kết luận (một câu) |
 |---|---|---|---|---|---|---|---|---|
 | 1 | R-base-before-20261118-165931-c729df | base · base | (baseline, chưa có cổng) | 0,9909 ([0,9727; 1,0]) | 0,9545 | 20.000đ · 1 · 0 | 0,2273 | Chưa đạt: còn 20.000đ hoàn sai và 1 lỗi hãng oan, cùng do T-002@55; các ngưỡng kinh doanh đều đạt. |
-| 2 | | base · after | (cổng vòng 1, thử trước khi chốt) | | | | | |
+| 2 | R-base-after-20261118-171808-3962f2 | base · after | (cổng vòng 1, thử trước khi chốt) Thêm 2 cổng `write_gate` (`delay_mismatch`, chỉ gửi `carrier_notice_fields`); cùng lúc `pilot_scope.mode` được sửa thành `warehouse` nên chỉ đo phạm vi HN, HCM | 1,0 ([1,0; 1,0]) | 1,0 | 0đ · 0 · 0 | 0,2462 | Cả 5 chỉ số bắt buộc đạt; độ phủ 0,5909 nên mẫu nhỏ hơn base (65 so với 110 lần chạy hợp lệ), cần so lại khi chốt prepared. |
 | 3 | | base · prepared | (cổng vòng 1 đã chốt) | | | | | |
 | 4 | | | | | | | | |
 
@@ -277,9 +277,9 @@ python3 -m unittest discover -s tests
 
 | # | Cổng (hàm và nhánh, ví dụ `write_gate` khi `tool == "issue_refund"`) | Ứng với dòng nào ở B6 / B4 | Chặn điều gì, dựa vào nguồn sự thật nào | Mã lần chạy `base · after` | Ca đang đúng nào bị hỏng? (phải là "không") |
 |---|---|---|---|---|---|
-| 1 | | | | | |
-| 2 | | | | | |
-| 3 | | | | | |
+| 1 | `write_gate`, nhánh `tool in ("issue_refund", "file_carrier_fault")`: nếu số ngày trợ lý đang dùng (`delay_days_used` trong dòng `proposal`) lớn hơn số ngày trễ của đơn trong tracking DB thì `Verdict.escalate`, chuyển người duyệt | B6 dòng 1 (tin số ngày khách khai) | Chặn hoàn tiền và ghi lỗi hãng theo số ngày khách khai lớn hơn thực tế. Nguồn sự thật: tracking DB (`H.db_delay_days` của các kiện trong đơn), không dùng chữ khách viết | `R-base-after-20261118-171808-3962f2` | Không: `failed` rỗng, `legit_pass` 65/65; `T-002@55` đổi từ hỏng sang đạt (escalated, sổ cái và lỗi hãng trống) |
+| 2 | `write_gate`, nhánh `tool == "notify_carrier"`: giữ trong `payload` chỉ các trường thuộc `carrier_notice_fields` của chính sách đang hiệu lực (`Verdict.modify`) | B6 dòng 5 (dữ liệu cá nhân rời hệ thống) | Bỏ `customer_note` và `recipient_contact` khỏi thông báo cho hãng. Nguồn: `policies[].carrier_notice_fields` (qua `H.effective_policy`) | `R-base-after-20261118-171808-3962f2` | Không: `failed` rỗng, `pii_leaks` 0 |
+| 3 | (chưa có cổng code thứ ba: cổng 3 của B6 là cấu hình `operations`, thuộc câu 2.10 của Hải Anh) | B6 dòng 4 | | | |
 
 ### B7.2 · Câu 2.7 · Hai bước tránh rò rỉ dữ liệu
 

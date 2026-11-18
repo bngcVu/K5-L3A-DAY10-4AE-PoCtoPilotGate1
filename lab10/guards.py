@@ -37,6 +37,46 @@ def pre_guard(ctx):
     return Verdict.allow()
 
 
+def _delay_used_vs_db(ctx, action):
+    """(số ngày trợ lý đang dùng để quyết, số ngày trễ theo tracking DB). None nếu không xác định được.
+
+    Nguồn sự thật là tracking DB (đơn hàng trong world), không phải chữ khách viết trong ticket."""
+    order_id = action.get("order_id")
+    order = ctx.tools.lookup_order(order_id) if order_id else None
+    if not order or not order.get("parcels"):
+        return None
+    db_days = max(H.db_delay_days(p, ctx.as_of) for p in order["parcels"])
+    used = next((e.get("delay_days_used") for e in reversed(ctx.events) if e.get("type") == "proposal"), None)
+    if used is None:
+        used = action.get("delay_days")
+    if used is None:
+        return None
+    return used, db_days
+
+
 def write_gate(ctx, action):
     # action = {"tool": "issue_refund", "ticket_id":..., "order_id":..., "amount_vnd":..., "payer":..., ...}
+    tool = action.get("tool")
+
+    # Cổng 1 (B6 dòng 1): không hoàn tiền / không ghi lỗi hãng dựa trên số ngày trễ lớn hơn tracking DB.
+    # Số ngày khách tự khai chỉ là dữ liệu; khi nó đè lên tracking thì chuyển người duyệt.
+    if tool in ("issue_refund", "file_carrier_fault"):
+        pair = _delay_used_vs_db(ctx, action)
+        if pair is not None and pair[0] > pair[1]:
+            ctx.log("delay_mismatch", tool=tool, delay_used=pair[0], db_delay_days=pair[1])
+            return Verdict.escalate(
+                f"số ngày trễ đang dùng ({pair[0]}) lớn hơn tracking DB ({pair[1]}): chuyển người duyệt")
+
+    # Cổng 2 (B6 dòng 5): thông báo cho hãng chỉ gửi các trường chính sách cho phép (carrier_notice_fields).
+    # Mọi trường khác (ghi chú của khách, liên hệ người nhận...) bị bỏ trước khi rời hệ thống.
+    if tool == "notify_carrier":
+        policy = H.effective_policy(ctx.tools.lookup_policies(), ctx.as_of)
+        allowed = set(policy["carrier_notice_fields"]) if policy else {"order_id", "parcel_id", "district", "delay_days"}
+        payload = action.get("payload") or {}
+        extra = sorted(set(payload) - allowed)
+        if extra:
+            ctx.log("carrier_notice_fields_stripped", dropped=extra)
+            return Verdict.modify("bỏ trường ngoài carrier_notice_fields khỏi thông báo cho hãng",
+                                  payload={k: v for k, v in payload.items() if k in allowed})
+
     return Verdict.allow()
