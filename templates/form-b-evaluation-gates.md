@@ -312,7 +312,7 @@ Mỗi con số kèm một câu lý do, lấy từ `data/world.json` → `ops_lim
 |---|---|---|
 | `business.daily_refund_cap_vnd` | 2.000.000đ/ngày | Theo `ops_limits.daily_auto_refund_budget_vnd = 2.000.000đ`, ngăn tổng hoàn tự động vượt ngân sách Finance trong ngày. |
 | `business.cost_budget_per_ticket_vnd` | 1.500đ/ticket | Theo `ops_limits.max_llm_cost_per_ticket_vnd = 1.500đ`, giới hạn chi phí LLM và nền tảng cho một ticket. |
-| `business.pilot_scope` (all / warehouse / percent) | Kho HN và HCM, 100% trong hai kho | Pilot bắt đầu ở hai depot nhưng dữ liệu mock có sẵn HN/HCM; thu hẹp theo kho giúp đối chiếu vùng Bắc/Nam mà không mở sang DN/CT/HCM-B2B trong vòng đầu. |
+| `business.pilot_scope` (all / warehouse / percent) | Kho HN và HCM, 100% trong hai kho | Đề yêu cầu pilot ở 2 depot; trong `data/world.json` HN (9 đơn) và HCM (5 đơn) là hai kho đủ đơn để đối chiếu vùng Bắc/Nam, còn DN (7 đơn), CT (4 đơn) và HCM-B2B tiếp tục làm tay ở vòng đầu để giới hạn thiệt hại nếu trợ lý sai. |
 | `business.roi_min` | 0.15 | Dựa trên chi phí làm tay 10.000đ/ticket và chi phí chuyển duyệt 10.000đ/ticket; cần ROI tối thiểu 15% để hỗ trợ pilot thay vì chỉ chuyển chi phí sang người duyệt. |
 
 ### B7.5 · Câu 2.10 · Cổng con người, vận hành, pháp lý + Runbook phần 1–3
