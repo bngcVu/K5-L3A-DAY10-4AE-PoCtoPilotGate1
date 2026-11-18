@@ -7,18 +7,29 @@
     "roi_min": 0.15
   },
   "operations": {
-    "pic": "",
-    "approver_id": "",
+    "pic": "NV-TUNG",
+    "approver_id": "NV-HANH",
     "reviewers_on_shift": 1,
-    "review_capacity_per_hour": null,
-    "max_queue_wait_minutes": null,
-    "stop_conditions": [],
-    "alert_channel": "",
-    "decision_note": false,
-    "review_sampling_pct": 0
+    "review_capacity_per_hour": 6,
+    "max_queue_wait_minutes": 60,
+    "stop_conditions": [
+      "Tổng tiền hoàn tự động trong ngày vượt trần ngân sách 2.000.000đ",
+      "Phát hiện tiền hoàn sai > 0đ hoặc có lỗi ghi oan cho hãng vận chuyển > 0",
+      "Phát hiện bất kỳ sự cố rò rỉ dữ liệu cá nhân PII ra bên thứ ba",
+      "Hàng chờ người duyệt bị ùn tắc quá hạn SLA 60 phút hoặc vượt quá 8 ca"
+    ],
+    "alert_channel": "#ops-refund-alert",
+    "decision_note": true,
+    "review_sampling_pct": 10
   },
   "legal": {
-    "pii_fields_blocked_to_third_party": [],
-    "carrier_fault_requires_recorded_cause": false
+    "pii_fields_blocked_to_third_party": [
+      "cccd",
+      "citizen_id",
+      "phone",
+      "bank_account",
+      "customer_note"
+    ],
+    "carrier_fault_requires_recorded_cause": true
   }
 }
