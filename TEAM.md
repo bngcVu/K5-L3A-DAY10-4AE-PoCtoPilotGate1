@@ -53,7 +53,7 @@ Mỗi thành viên tự viết một mục bên dưới (chép mẫu, đổi ti�
 
 ### Bằng chứng
 
-- Mã commit: `0d135c4` và `9c80523` (ký tiêu chí), `64173df` (hai cổng `write_gate`), `58ced7d` (chốt cổng vòng 1), commit vòng 2 và gói nộp (chờ commit)
+- Mã commit: `0d135c4` và `9c80523` (ký tiêu chí), `64173df` (hai cổng `write_gate`), `58ced7d` (chốt cổng vòng 1), `1419b65` (cổng vòng 2 S1), `bb64423` (bằng chứng S1 trong TEAM.md)
 - Mã lần chạy (`runs/<mã>`): base `R-base-before-20261118-165931-c729df` · after `R-base-after-20261118-171808-3962f2` · prepared `R-base-prepared-20261118-173653-207099`; thẻ S1: base `R-S1-before-20261118-230407-56e06d` · prepared `R-S1-prepared-20261118-230407-56e06d` · after `R-S1-after-20261118-230407-56e06d` (grade `R-S1-grade-20261118-230407-56e06d`); hồi quy bộ nền `R-base-after-20261118-230421-56e06d`
 - Dòng trong phiếu A/B/C: A3 (câu 1.5), B0 dòng 1–2, B1, B6, B7.1; Phiếu C: C0, C1, C2, C4–C9; đã dùng Claude Code hỗ trợ viết cổng, chạy lệnh và soạn phiếu
 
@@ -122,13 +122,13 @@ Mỗi thành viên tự viết một mục bên dưới (chép mẫu, đổi ti�
 - Định lượng tiêu chí thành công tài chính: trần hoàn sai bằng 0đ, chi phí mỗi ticket tối đa 10.000đ, ROI tối thiểu 15%.
 - Cấu hình các tham số kinh doanh trong `config/operating_gates.json`: trần hoàn tự động 2.000.000đ/ngày, ngân sách LLM 1.500đ/ticket, pilot HN/HCM 100%.
 - Điền mục tiêu, bản đồ dữ liệu và drift chính sách trong Phiếu A/B; chuẩn bị khung HAZOP tác động tài chính/ROI cho vòng sự cố.
-- Chưa ghi quyết định v1/v2 vì cần report base/prepared/after và thẻ sự cố đã bốc.
+- Quyết định Gate 1: v1 và v2 đều ghi "Tiếp tục" trong `submission/submission.json`; v2 dựa trên report S1 (mốc after không vượt trần nào, mọi ngưỡng đã ký đạt: hoàn sai 0đ, lỗi hãng oan 0).
 
 ### Bằng chứng
 
-- Mã commit: chờ commit riêng phần thay đổi của Dung.
-- Mã lần chạy (`runs/<mã>`): chờ Vũ chạy base/prepared và lệnh grade incident.
-- Dòng trong phiếu A/B/C: A1, A4, B3, B7.4; B8/C12 chờ bằng chứng báo cáo.
+- Mã commit: `bd0b497` (đầu vào kinh doanh Gate 1), `734014d` (A4 ngưỡng chuyển người REFUND-v3), `36591fa` (`pilot_scope.mode` = warehouse), `9d070f8` (B7.4 căn cứ số đơn theo kho)
+- Mã lần chạy (`runs/<mã>`): dùng các mã của Vũ: base `R-S1-before-20261118-230407-56e06d` · prepared `R-S1-prepared-20261118-230407-56e06d` · after `R-S1-after-20261118-230407-56e06d` (grade `R-S1-grade-20261118-230407-56e06d`)
+- Dòng trong phiếu A/B/C: A1, A4, B3, B7.4, B8; C4 (tác động tài chính/ROI), C12
 
 ### Exit ticket
 
